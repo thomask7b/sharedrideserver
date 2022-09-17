@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.13.RELEASE"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
+    jacoco
 }
 
 group = "org.flotho"
@@ -38,4 +39,15 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        html.required.set(false)
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }
