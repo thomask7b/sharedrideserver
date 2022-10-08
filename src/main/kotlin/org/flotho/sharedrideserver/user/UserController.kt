@@ -4,11 +4,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.flotho.sharedrideserver.Utils
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 
@@ -90,6 +90,6 @@ class UserController(
     }
 
     private fun isAuthenticated(auth: Authentication, usernameAccessed: String): Boolean {
-        return usernameAccessed == (auth.principal as UserDetails).username
+        return usernameAccessed == Utils.usernameFromAuthentication(auth)
     }
 }
