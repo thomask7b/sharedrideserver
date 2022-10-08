@@ -23,7 +23,7 @@ private const val PASSWORD = "testPassword"
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserControllerIntTest @Autowired constructor(
+class UserIntegrationTest @Autowired constructor(
     private val userRepository: UserRepository,
     private val restTemplate: TestRestTemplate
 ) {
@@ -60,7 +60,7 @@ class UserControllerIntTest @Autowired constructor(
         val response = restTemplate.postForEntity(
             getRootUrl() + "/create",
             UserDto(username, password),
-            Boolean::class.java
+            Void::class.java
         )
 
         assertEquals(HttpStatus.CREATED, response.statusCode)

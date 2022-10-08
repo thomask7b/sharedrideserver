@@ -10,9 +10,8 @@ class UserService(
         userRepository.insert(User(name = userDto.name, password = userDto.password!!))
     }
 
-    fun findUser(name: String): UserDto {
-        val user = userRepository.findOneByName(name)
-        return UserDto(user.name)
+    fun findUser(name: String): User {
+        return userRepository.findOneByName(name)
     }
 
     fun deleteUser(name: String) {
