@@ -17,7 +17,7 @@ import java.net.URI
 class UserController(
     private val userService: UserService
 ) {
-    @Operation(summary = "Créer un utlisateur", description = "Création d'un utilisateur en cas de réussite")
+    @Operation(summary = "Crée un utlisateur", description = "Création d'un utilisateur en cas de réussite")
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201", description = "Création réussie"),
