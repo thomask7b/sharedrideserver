@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.Utils
 import org.flotho.sharedrideserver.user.UserService
 import org.springframework.http.HttpStatus
@@ -59,7 +60,7 @@ class SharedRideController(
             if (!isManager(auth, id)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
-            sharedRideService.deleteSharedRide(id)
+            sharedRideService.deleteSharedRide(ObjectId(id))
             ResponseEntity.accepted().build()
         } catch (e: Exception) {
             ResponseEntity.badRequest().build()
@@ -80,7 +81,7 @@ class SharedRideController(
     @GetMapping("/{id}")
     fun getSharedRide(auth: Authentication, @PathVariable("id") id: String): ResponseEntity<SharedRide> {
         return try {
-            var sharedRide = sharedRideService.findSharedRide(id)
+            var sharedRide = sharedRideService.findSharedRide(ObjectId(id))
             val user = userService.findUser((auth.principal as UserDetails).username)
             if (!sharedRide.get().users.contains(user.name)) {
                 sharedRide = sharedRideService.addUserToSharedRide(user.name, sharedRide.get())
@@ -92,7 +93,7 @@ class SharedRideController(
     }
 
     private fun isManager(auth: Authentication, id: String): Boolean {
-        val manager = sharedRideService.findSharedRide(id).get().users.iterator().next()
+        val manager = sharedRideService.findSharedRide(ObjectId(id)).get().users.iterator().next()
         return Utils.usernameFromAuthentication(auth) == manager
     }
 

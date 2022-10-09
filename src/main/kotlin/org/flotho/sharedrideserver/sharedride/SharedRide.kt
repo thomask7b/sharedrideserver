@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class SharedRide(
     @Id
-    val id: String = ObjectId.get().toHexString(),
+    val id: ObjectId = ObjectId.get(),
     val users: LinkedHashSet<String>
 )

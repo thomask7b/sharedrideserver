@@ -1,5 +1,6 @@
 package org.flotho.sharedrideserver.sharedride
 
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -11,7 +12,7 @@ class SharedRideService(
         sharedRideRepository.insert(sharedRide)
     }
 
-    fun findSharedRide(id: String): Optional<SharedRide> {
+    fun findSharedRide(id: ObjectId): Optional<SharedRide> {
         return sharedRideRepository.findById(id)
     }
 
@@ -24,7 +25,7 @@ class SharedRideService(
         return updatedSharedRide
     }
 
-    fun deleteSharedRide(id: String) {
+    fun deleteSharedRide(id: ObjectId) {
         sharedRideRepository.deleteById(id)
     }
 }

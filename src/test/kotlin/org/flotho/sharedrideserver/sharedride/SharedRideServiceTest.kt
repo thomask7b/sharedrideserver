@@ -1,6 +1,5 @@
 package org.flotho.sharedrideserver.sharedride
 
-import org.bson.types.ObjectId
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -32,8 +31,7 @@ class SharedRideServiceTest @Autowired constructor(
 
     private fun createSharedRide(): SharedRide {
         val sharedRide = SharedRide(
-            ObjectId.get().toHexString(),
-            linkedSetOf(FIRST_USER)
+            users = linkedSetOf(FIRST_USER)
         )
         sharedRideService.createSharedRide(sharedRide)
         return sharedRide
