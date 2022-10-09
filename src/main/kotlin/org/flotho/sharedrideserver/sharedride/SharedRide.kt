@@ -1,6 +1,7 @@
 package org.flotho.sharedrideserver.sharedride
 
 import org.bson.types.ObjectId
+import org.flotho.sharedrideserver.common.Location
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -8,5 +9,5 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class SharedRide(
     @Id
     val id: ObjectId = ObjectId.get(),
-    val users: LinkedHashSet<String>
+    val usersAndLocations: MutableMap<String, Location?>
 )

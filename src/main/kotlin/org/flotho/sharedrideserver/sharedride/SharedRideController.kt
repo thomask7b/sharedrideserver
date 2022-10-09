@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.net.URI
 
@@ -32,7 +31,7 @@ class SharedRideController(
     fun createSharedRide(auth: Authentication): ResponseEntity<Void> {
         return try {
             val user = userService.findUser(Utils.usernameFromAuthentication(auth))
-            val sharedRide = SharedRide(users = linkedSetOf(user.name))
+            val sharedRide = SharedRide(usersAndLocations = mutableMapOf(Pair(user.name, null)))
             sharedRideService.createSharedRide(sharedRide)
             ResponseEntity.created(URI.create("/sharedride/${sharedRide.id}")).build()
         } catch (e: Exception) {
@@ -82,9 +81,9 @@ class SharedRideController(
     fun getSharedRide(auth: Authentication, @PathVariable("id") id: String): ResponseEntity<SharedRide> {
         return try {
             var sharedRide = sharedRideService.findSharedRide(ObjectId(id))
-            val user = userService.findUser((auth.principal as UserDetails).username)
-            if (!sharedRide.get().users.contains(user.name)) {
-                sharedRide = sharedRideService.addUserToSharedRide(user.name, sharedRide.get())
+            val username = Utils.usernameFromAuthentication(auth)
+            if (!sharedRide.get().usersAndLocations.contains(username)) {
+                sharedRide = sharedRideService.updateSharedRide(sharedRide.get(), username)
             }
             ResponseEntity.ok(sharedRide.get())
         } catch (e: Exception) {
@@ -93,7 +92,7 @@ class SharedRideController(
     }
 
     private fun isManager(auth: Authentication, id: String): Boolean {
-        val manager = sharedRideService.findSharedRide(ObjectId(id)).get().users.iterator().next()
+        val manager = sharedRideService.findSharedRide(ObjectId(id)).get().usersAndLocations.iterator().next().key
         return Utils.usernameFromAuthentication(auth) == manager
     }
 
