@@ -1,6 +1,6 @@
 package org.flotho.sharedrideserver.sharedride
 
-import org.flotho.sharedrideserver.common.Location
+import org.flotho.sharedrideserver.location.Location
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -49,7 +49,7 @@ class SharedRideServiceTest @Autowired constructor(
     fun `should add user in sharedRide`() {
         val sharedRide = createSharedRide()
 
-        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide, SECOND_USER)
+        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, SECOND_USER)
 
         assertTrue(updatedSharedRide.get().usersAndLocations.contains(SECOND_USER))
     }
@@ -59,7 +59,7 @@ class SharedRideServiceTest @Autowired constructor(
         val location = Location(11.79584, 9.83205)
         val sharedRide = createSharedRide()
 
-        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide, FIRST_USER, location)
+        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, FIRST_USER, location)
         val userLocationInSharedRide = updatedSharedRide.get().usersAndLocations[FIRST_USER]
 
         assertEquals(userLocationInSharedRide?.latitude, location.latitude)

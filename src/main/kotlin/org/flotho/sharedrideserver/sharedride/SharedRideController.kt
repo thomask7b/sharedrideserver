@@ -83,7 +83,7 @@ class SharedRideController(
             var sharedRide = sharedRideService.findSharedRide(ObjectId(id))
             val username = Utils.usernameFromAuthentication(auth)
             if (!sharedRide.get().usersAndLocations.contains(username)) {
-                sharedRide = sharedRideService.updateSharedRide(sharedRide.get(), username)
+                sharedRide = sharedRideService.updateSharedRide(sharedRide.get().id, username)
             }
             ResponseEntity.ok(sharedRide.get())
         } catch (e: Exception) {

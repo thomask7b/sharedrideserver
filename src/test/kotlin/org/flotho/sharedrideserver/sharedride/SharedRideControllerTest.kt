@@ -79,7 +79,7 @@ class SharedRideControllerTest @Autowired constructor(
         optSharedRide.map {
             it.usersAndLocations["addedUser"] = null
         }
-        `when`(sharedRideService.updateSharedRide(optSharedRide.get(), ADDED_USERNAME)).thenReturn(optSharedRide)
+        `when`(sharedRideService.updateSharedRide(optSharedRide.get().id, ADDED_USERNAME)).thenReturn(optSharedRide)
 
         mvc.perform(
             get("/sharedride/${optSharedRide.get().id}")

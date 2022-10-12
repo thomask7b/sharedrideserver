@@ -1,7 +1,7 @@
 package org.flotho.sharedrideserver.sharedride
 
 import org.bson.types.ObjectId
-import org.flotho.sharedrideserver.common.Location
+import org.flotho.sharedrideserver.location.Location
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -17,9 +17,9 @@ class SharedRideService(
         return sharedRideRepository.findById(id)
     }
 
-    fun updateSharedRide(sharedRide: SharedRide, username: String, location: Location? = null): Optional<SharedRide> {
+    fun updateSharedRide(sharedRideId: ObjectId, username: String, location: Location? = null): Optional<SharedRide> {
         var updatedSharedRide: Optional<SharedRide> = Optional.empty()
-        findSharedRide(sharedRide.id).ifPresent {
+        findSharedRide(sharedRideId).ifPresent {
             it.usersAndLocations[username] = location
             updatedSharedRide = Optional.of(sharedRideRepository.save(it))
         }
