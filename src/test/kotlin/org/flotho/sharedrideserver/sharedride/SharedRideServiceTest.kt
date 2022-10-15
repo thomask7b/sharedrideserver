@@ -1,5 +1,6 @@
 package org.flotho.sharedrideserver.sharedride
 
+import org.awaitility.Awaitility.await
 import org.flotho.sharedrideserver.location.Location
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo
 import org.springframework.boot.test.context.SpringBootTest
+import java.util.concurrent.TimeUnit
 
 private const val FIRST_USER = "first"
 private const val SECOND_USER = "second"
@@ -73,5 +75,23 @@ class SharedRideServiceTest @Autowired constructor(
         sharedRideService.deleteSharedRide(sharedRide.id)
 
         assertFalse(sharedRideService.findSharedRide(sharedRide.id).isPresent)
+    }
+
+    @Test
+    fun `should schedule database updates`() {
+        val location = Location(11.79584, 9.83205)
+        val sharedRide = createSharedRide()
+
+        sharedRideService.updateCache(sharedRide.id, FIRST_USER, location)
+
+        assertNull(sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USER])
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .untilAsserted {
+                assertEquals(
+                    location,
+                    sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USER]
+                )
+            }
     }
 }

@@ -30,7 +30,7 @@ import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.TimeUnit
 
-class SharedRideWebSocketTest @Autowired constructor(
+class SharedRideWebSocketIntegrationTest @Autowired constructor(
     userRepository: UserRepository,
     restTemplate: TestRestTemplate,
     val objectMapper: ObjectMapper

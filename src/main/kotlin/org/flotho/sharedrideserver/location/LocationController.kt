@@ -19,8 +19,7 @@ class LocationController(
     fun updateRealTimeLocation(auth: Authentication, jsonUserLocation: String): String? {
         val userLocation = objectMapper.readValue(jsonUserLocation, UserLocationDto::class.java)
         if (userLocation.sharedRideId != null && userLocation.username == Utils.usernameFromAuthentication(auth)) {
-            //TODO ajout en BDD via shceduler
-            sharedRideService.updateSharedRide(
+            sharedRideService.updateCache(
                 ObjectId(userLocation.sharedRideId),
                 userLocation.username,
                 userLocation.location
