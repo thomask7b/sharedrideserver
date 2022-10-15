@@ -1,6 +1,6 @@
 package org.flotho.sharedrideserver.user
 
-import io.swagger.v3.core.util.ObjectMapperFactory
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 private const val USERNAME = "testUser"
 private const val PASSWORD = "pwd"
 private const val ROLE = "USER"
-private val JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,7 +32,8 @@ class UserControllerTest @Autowired constructor(
     @MockBean
     private val userService: UserService,
     @InjectMocks
-    private val userController: UserController
+    private val userController: UserController,
+    val objectMapper: ObjectMapper
 ) {
     @BeforeAll
     fun setup() {
@@ -47,7 +47,7 @@ class UserControllerTest @Autowired constructor(
         mvc.perform(
             post("/users/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JSON_MAPPER.writeValueAsString(userDto))
+                .content(objectMapper.writeValueAsString(userDto))
         )
             .andExpect(status().isCreated)
             .andExpect(header().string("location", containsString("/users/${userDto.name}")))
@@ -61,7 +61,7 @@ class UserControllerTest @Autowired constructor(
         mvc.perform(
             post("/users/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JSON_MAPPER.writeValueAsString(userDto))
+                .content(objectMapper.writeValueAsString(userDto))
         )
             .andExpect(status().isBadRequest)
     }

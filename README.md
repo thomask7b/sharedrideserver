@@ -7,13 +7,20 @@
 
 Les prérequis sont une JRE 17 ainsi qu'un service mongod démarré.
 
+Il faudra aussi ajouter la clé pour l'API Google Maps nommée **MAPS_API_KEY** en variable d'environnement.
+Exemple sous Ubuntu:
+
+```
+sudo echo MAPS_API_KEY=maCle >> /etc/environment
+```
+
 Pour obtenir une base de données pré-remplie avec un jeux d'essai :
 
 ```
 mongosh < create-test-db.js
 ```
 
-> **Attention :** si une base de données "sharedride" existe déjà elle sera supprimée.
+> **Attention :** si une base de données "sharedRide" existe déjà elle sera supprimée.
 
 Pour produire un **jar** executable :
 
