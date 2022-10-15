@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service
 @Service
 class DirectionService {
 
+    private val context: GeoApiContext = GeoApiContext.Builder().apiKey(Utils.mapsApiKey()).build()
+
     fun requestDirection(places: List<String>): DirectionsResult? {
-        val context: GeoApiContext = GeoApiContext.Builder().apiKey(Utils.mapsApiKey()).build()
         return DirectionsApi.newRequest(context)
             .origin(places[0])
             .destination(places.last())
