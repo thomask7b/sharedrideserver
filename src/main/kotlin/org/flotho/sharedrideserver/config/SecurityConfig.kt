@@ -19,12 +19,13 @@ class SecurityConfig(
         http.authorizeRequests()
             .antMatchers("/users/create").anonymous()
             .antMatchers("/users/**").authenticated()
+            .antMatchers("/sharedride-ws-endpoint").authenticated()
             .anyRequest().permitAll()
             .and()
             .formLogin().loginPage("/login-view").loginProcessingUrl("/login")
             .usernameParameter("name").passwordParameter("password")
         return http.userDetailsService(userDetailsServiceImpl)
-            .csrf().disable().build()
+            .csrf().disable().build()//TODO activer crsf
     }
 
     @Bean
