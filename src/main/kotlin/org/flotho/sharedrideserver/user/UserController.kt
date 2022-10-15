@@ -46,10 +46,7 @@ class UserController(
         ]
     )
     @DeleteMapping("/{name}")
-    fun deleteUser(
-        auth: Authentication,
-        @PathVariable("name") name: String
-    ): ResponseEntity<Void> {
+    fun deleteUser(auth: Authentication, @PathVariable("name") name: String): ResponseEntity<Void> {
         return try {
             if (!isAuthenticated(auth, name)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()

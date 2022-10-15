@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.Utils
+import org.flotho.sharedrideserver.direction.DirectionService
 import org.flotho.sharedrideserver.user.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,20 +19,25 @@ import java.net.URI
 @RequestMapping("/sharedride")
 class SharedRideController(
     private val sharedRideService: SharedRideService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val directionService: DirectionService
 ) {
-    @Operation(summary = "Crée un shared ride", description = "Création d'un shared ride")
+    @Operation(
+        summary = "Crée un shared ride", description = "Création d'un shared ride. Il contiendra les " +
+                "utilisateurs et leurs localisations, ainsi que l'itinéraire renvoyé par l'API Directions de Google Maps."
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "201", description = "Création réussie"),
             ApiResponse(responseCode = "400", description = "Le shared ride n'a pas pu être créé"),
         ]
     )
-    @GetMapping("/create")
-    fun createSharedRide(auth: Authentication): ResponseEntity<Void> {
+    @PostMapping("/create", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun createSharedRide(auth: Authentication, @RequestBody steps: List<String>): ResponseEntity<Void> {
         return try {
             val user = userService.findUser(Utils.usernameFromAuthentication(auth))
-            val sharedRide = SharedRide(usersAndLocations = mutableMapOf(Pair(user.name, null)))
+            val route = directionService.requestDirection(steps)
+            val sharedRide = SharedRide(usersAndLocations = mutableMapOf(Pair(user.name, null)), direction = route!!)
             sharedRideService.createSharedRide(sharedRide)
             ResponseEntity.created(URI.create("/sharedride/${sharedRide.id}")).build()
         } catch (e: Exception) {
@@ -51,10 +57,7 @@ class SharedRideController(
         ]
     )
     @DeleteMapping("/{id}")
-    fun deleteSharedRide(
-        auth: Authentication,
-        @PathVariable("id") id: String
-    ): ResponseEntity<Void> {
+    fun deleteSharedRide(auth: Authentication, @PathVariable("id") id: String): ResponseEntity<Void> {
         return try {
             if (!isManager(auth, id)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()

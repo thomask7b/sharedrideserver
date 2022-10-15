@@ -1,20 +1,26 @@
 package org.flotho.sharedrideserver.sharedride
 
+import com.google.maps.model.DirectionsResult
 import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.AbstractIntegrationTest
+import org.flotho.sharedrideserver.direction.DirectionService
 import org.flotho.sharedrideserver.user.User
 import org.flotho.sharedrideserver.user.UserDto
 import org.flotho.sharedrideserver.user.UserRepository
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.*
 
 class SharedRideIntegrationTest @Autowired constructor(
     userRepository: UserRepository,
     restTemplate: TestRestTemplate,
-    val sharedRideRepository: SharedRideRepository
+    val sharedRideRepository: SharedRideRepository,
+    @MockBean
+    val directionService: DirectionService
 ) : AbstractIntegrationTest(userRepository, restTemplate) {
 
     override val routePath = "/sharedride/"
@@ -34,10 +40,11 @@ class SharedRideIntegrationTest @Autowired constructor(
     }
 
     private fun requestCreateSharedRide(headers: HttpHeaders): ResponseEntity<Void> {
+        `when`(directionService.requestDirection(listOf())).thenReturn(DirectionsResult())
         return restTemplate.exchange(
             getBaseUrl() + "create",
-            HttpMethod.GET,
-            HttpEntity(null, headers),
+            HttpMethod.POST,
+            HttpEntity(listOf<String>(), headers),
             Void::class.java
         )
     }
