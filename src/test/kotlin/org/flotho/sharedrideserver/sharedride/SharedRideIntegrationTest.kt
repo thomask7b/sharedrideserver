@@ -1,9 +1,9 @@
 package org.flotho.sharedrideserver.sharedride
 
-import com.google.maps.model.DirectionsResult
 import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.AbstractIntegrationTest
 import org.flotho.sharedrideserver.direction.DirectionService
+import org.flotho.sharedrideserver.direction.model.DirectionsData
 import org.flotho.sharedrideserver.user.User
 import org.flotho.sharedrideserver.user.UserDto
 import org.flotho.sharedrideserver.user.UserRepository
@@ -40,7 +40,7 @@ class SharedRideIntegrationTest @Autowired constructor(
     }
 
     private fun requestCreateSharedRide(headers: HttpHeaders): ResponseEntity<Void> {
-        `when`(directionService.requestDirection(listOf())).thenReturn(DirectionsResult())
+        `when`(directionService.requestDirection(listOf())).thenReturn(DirectionsData(listOf(), listOf()))
         return restTemplate.exchange(
             getBaseUrl() + "create",
             HttpMethod.POST,
