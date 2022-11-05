@@ -1,7 +1,7 @@
 package org.flotho.sharedrideserver.sharedride
 
-import com.google.maps.model.DirectionsResult
 import org.awaitility.Awaitility.await
+import org.flotho.sharedrideserver.direction.model.DirectionsData
 import org.flotho.sharedrideserver.location.Location
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
@@ -36,7 +36,7 @@ class SharedRideServiceTest @Autowired constructor(
     private fun createSharedRide(): SharedRide {
         val sharedRide = SharedRide(
             usersAndLocations = mutableMapOf(Pair(FIRST_USER, null)),
-            direction = DirectionsResult()
+            direction = DirectionsData(listOf(), listOf())
         )
         sharedRideService.createSharedRide(sharedRide)
         return sharedRide
