@@ -1,6 +1,10 @@
 package org.flotho.sharedrideserver.sharedride
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.PASSWORD
+import org.flotho.sharedrideserver.ROLE
+import org.flotho.sharedrideserver.SECOND_USERNAME
 import org.flotho.sharedrideserver.direction.DirectionService
 import org.flotho.sharedrideserver.direction.model.DirectionsData
 import org.flotho.sharedrideserver.user.User
@@ -22,11 +26,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.*
-
-private const val USERNAME = "testUser"
-private const val ADDED_USERNAME = "addedUser"
-private const val PASSWORD = "pwd"
-private const val ROLE = "USER"
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,10 +60,10 @@ class SharedRideControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should create shared ride`() {
         `when`(directionService.requestDirection(listOf())).thenReturn(DirectionsData(listOf(), listOf()))
-        `when`(userService.findUser(USERNAME)).thenReturn(User(name = USERNAME, password = PASSWORD))
+        `when`(userService.findUser(FIRST_USERNAME)).thenReturn(User(name = FIRST_USERNAME, password = PASSWORD))
 
         mvc.perform(
             post("/sharedride/create")
@@ -76,38 +75,38 @@ class SharedRideControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should get shared ride`() {
-        val optSharedRide = mockedSharedRide(USERNAME)
+        val optSharedRide = mockedSharedRide(FIRST_USERNAME)
 
         mvc.perform(
             get("/sharedride/${optSharedRide.get().id}")
         )
             .andExpect(status().isOk)
-            .andExpect(content().string(containsString(USERNAME)))
+            .andExpect(content().string(containsString(FIRST_USERNAME)))
     }
 
     @Test
-    @WithMockUser(username = ADDED_USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = SECOND_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should add user in shared ride`() {
-        val optSharedRide = mockedSharedRide(USERNAME)
+        val optSharedRide = mockedSharedRide(FIRST_USERNAME)
         optSharedRide.map {
-            it.usersAndLocations["addedUser"] = null
+            it.usersAndLocations[SECOND_USERNAME] = null
         }
-        `when`(sharedRideService.updateSharedRide(optSharedRide.get().id, ADDED_USERNAME)).thenReturn(optSharedRide)
+        `when`(sharedRideService.updateSharedRide(optSharedRide.get().id, SECOND_USERNAME)).thenReturn(optSharedRide)
 
         mvc.perform(
             get("/sharedride/${optSharedRide.get().id}")
         )
             .andExpect(status().isOk)
-            .andExpect(content().string(containsString(USERNAME)))
-            .andExpect(content().string(containsString(ADDED_USERNAME)))
+            .andExpect(content().string(containsString(FIRST_USERNAME)))
+            .andExpect(content().string(containsString(SECOND_USERNAME)))
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should delete shared ride`() {
-        val optSharedRide = mockedSharedRide(USERNAME)
+        val optSharedRide = mockedSharedRide(FIRST_USERNAME)
 
         mvc.perform(
             delete("/sharedride/${optSharedRide.get().id}")
@@ -116,7 +115,7 @@ class SharedRideControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should not delete shared ride`() {
         val optSharedRide = mockedSharedRide("anyUser")
 

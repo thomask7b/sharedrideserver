@@ -2,30 +2,36 @@ package org.flotho.sharedrideserver.location
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.bson.types.ObjectId
-import org.flotho.sharedrideserver.Utils
+import org.flotho.sharedrideserver.Utils.isAuthenticated
 import org.flotho.sharedrideserver.sharedride.SharedRideService
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
-import org.springframework.security.core.Authentication
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
+import java.security.Principal
+
 
 @Controller
 class LocationController(
     val objectMapper: ObjectMapper,
-    val sharedRideService: SharedRideService
+    val sharedRideService: SharedRideService,
+    val template: SimpMessagingTemplate
 ) {
     @MessageMapping("/location")
     @SendTo("/sharedride-ws/locations")
-    fun updateRealTimeLocation(auth: Authentication, jsonUserLocation: String): String? {
+    fun updateRealTimeLocation(authenticatedUser: Principal, jsonUserLocation: String) {
         val userLocation = objectMapper.readValue(jsonUserLocation, UserLocationDto::class.java)
-        if (userLocation.sharedRideId != null && userLocation.username == Utils.usernameFromAuthentication(auth)) {
+        if (userLocation.sharedRideId != null && isAuthenticated(authenticatedUser, userLocation.username!!)) {
             sharedRideService.updateCache(
                 ObjectId(userLocation.sharedRideId),
                 userLocation.username,
                 userLocation.location
             )
-            return jsonUserLocation
+            sharedRideService.getSharedRideUsernames(ObjectId(userLocation.sharedRideId)).ifPresent { users ->
+                users.forEach {
+                    template.convertAndSendToUser(it, "/sharedride-ws/locations", jsonUserLocation)
+                }
+            }
         }
-        return null
     }
 }

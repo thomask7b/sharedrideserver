@@ -4,7 +4,6 @@ import org.flotho.sharedrideserver.user.User
 import org.flotho.sharedrideserver.user.UserDto
 import org.flotho.sharedrideserver.user.UserRepository
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,28 +21,22 @@ abstract class AbstractIntegrationTest @Autowired constructor(
     protected val restTemplate: TestRestTemplate
 ) {
     protected abstract val routePath: String
-    
-    protected val username = "testUser"
-    protected val password = "testPassword"
 
     @LocalServerPort
     protected var port: Int = 0
 
-    @BeforeEach
-    fun setUp() {
-        userRepository.deleteAll()
-    }
+    protected fun getRootUrl(): String = "http://localhost:$port"
+    protected fun getBaseUrl(): String = getRootUrl() + routePath
+    protected fun saveFirstUser() = userRepository.save(User(name = FIRST_USERNAME, password = PASSWORD))
+    protected fun saveSecondUser() = userRepository.save(User(name = SECOND_USERNAME, password = PASSWORD))
+    protected fun deleteUsers() = userRepository.deleteAll()
 
     @AfterAll
     fun afterAll() {
-        userRepository.deleteAll()
+        deleteUsers()
     }
 
-    protected fun getRootUrl(): String = "http://localhost:$port"
-    protected fun getBaseUrl(): String = getRootUrl() + routePath
-    protected fun saveTestUser() = userRepository.save(User(name = username, password = password))
-
-    protected fun login(user: UserDto = UserDto(username, password)): HttpHeaders {
+    protected fun login(user: UserDto = UserDto(FIRST_USERNAME, PASSWORD)): HttpHeaders {
         val headers = HttpHeaders()
         val token = restTemplate.postForEntity(
             getRootUrl() + "/auth",

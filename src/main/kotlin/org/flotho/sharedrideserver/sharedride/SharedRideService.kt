@@ -13,7 +13,7 @@ class SharedRideService(
     private val sharedRideRepository: SharedRideRepository
 ) {
     private val executorService: ScheduledExecutorService = Executors.newScheduledThreadPool(10)
-    private val cache: MutableMap<ObjectId, MutableMap<String, Location?>> = mutableMapOf()
+    private val cache: MutableMap<ObjectId, MutableMap<String, Location?>> = Collections.synchronizedMap(mutableMapOf())
 
     fun createSharedRide(sharedRide: SharedRide) {
         createCacheAndScheduleUpdate(sharedRide)
@@ -22,6 +22,10 @@ class SharedRideService(
 
     fun findSharedRide(id: ObjectId): Optional<SharedRide> {
         return sharedRideRepository.findById(id)
+    }
+
+    fun getSharedRideUsernames(id: ObjectId): Optional<Set<String>> {
+        return Optional.ofNullable(cache[id]?.keys)
     }
 
     fun updateSharedRide(sharedRideId: ObjectId, username: String, location: Location? = null): Optional<SharedRide> {
@@ -35,6 +39,11 @@ class SharedRideService(
     }
 
     fun updateCache(sharedRideId: ObjectId, username: String, location: Location?) {
+        if (cache[sharedRideId].isNullOrEmpty()) {
+            findSharedRide(sharedRideId).ifPresent {
+                createCacheAndScheduleUpdate(it)
+            }
+        }
         cache[sharedRideId]?.put(username, location)
     }
 

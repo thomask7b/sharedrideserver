@@ -4,13 +4,13 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.flotho.sharedrideserver.Utils
+import org.flotho.sharedrideserver.Utils.isAuthenticated
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.net.URI
+import java.security.Principal
 
 @RestController
 @RequestMapping("/users")
@@ -46,9 +46,9 @@ class UserController(
         ]
     )
     @DeleteMapping("/{name}")
-    fun deleteUser(auth: Authentication, @PathVariable("name") name: String): ResponseEntity<Void> {
+    fun deleteUser(authenticatedUser: Principal, @PathVariable("name") name: String): ResponseEntity<Void> {
         return try {
-            if (!isAuthenticated(auth, name)) {
+            if (!isAuthenticated(authenticatedUser, name)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
             userService.deleteUser(name)
@@ -74,9 +74,9 @@ class UserController(
         ]
     )
     @GetMapping("/{name}")
-    fun getUser(auth: Authentication, @PathVariable("name") name: String): ResponseEntity<UserDto> {
+    fun getUser(authenticatedUser: Principal, @PathVariable("name") name: String): ResponseEntity<UserDto> {
         return try {
-            if (!isAuthenticated(auth, name)) {
+            if (!isAuthenticated(authenticatedUser, name)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
             val user = userService.findUser(name)
@@ -84,9 +84,5 @@ class UserController(
         } catch (e: Exception) {
             ResponseEntity.badRequest().build()
         }
-    }
-
-    private fun isAuthenticated(auth: Authentication, usernameAccessed: String): Boolean {
-        return usernameAccessed == Utils.usernameFromAuthentication(auth)
     }
 }

@@ -1,6 +1,10 @@
 package org.flotho.sharedrideserver.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.PASSWORD
+import org.flotho.sharedrideserver.ROLE
+import org.flotho.sharedrideserver.SECOND_USERNAME
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -20,10 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-private const val USERNAME = "testUser"
-private const val PASSWORD = "pwd"
-private const val ROLE = "USER"
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,7 +42,7 @@ class UserControllerTest @Autowired constructor(
 
     @Test
     fun `should create user`() {
-        val userDto = UserDto(name = USERNAME, password = PASSWORD)
+        val userDto = UserDto(name = FIRST_USERNAME, password = PASSWORD)
 
         mvc.perform(
             post("/users/create")
@@ -55,7 +55,7 @@ class UserControllerTest @Autowired constructor(
 
     @Test
     fun `should not create user`() {
-        val userDto = UserDto(name = USERNAME, password = PASSWORD)
+        val userDto = UserDto(name = FIRST_USERNAME, password = PASSWORD)
         `when`(userService.createUser(userDto)).thenThrow(DuplicateKeyException::class.java)
 
         mvc.perform(
@@ -67,9 +67,9 @@ class UserControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should delete user`() {
-        val userDto = UserDto(name = USERNAME, password = PASSWORD)
+        val userDto = UserDto(name = FIRST_USERNAME, password = PASSWORD)
 
         mvc.perform(
             delete("/users/{name}", userDto.name)
@@ -78,9 +78,9 @@ class UserControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should not delete an other user`() {
-        val userDto = UserDto(name = "otherUser", password = "")
+        val userDto = UserDto(name = SECOND_USERNAME, password = PASSWORD)
 
         mvc.perform(
             delete("/users/{name}", userDto.name)
@@ -89,9 +89,9 @@ class UserControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should get user`() {
-        val userDto = UserDto(name = USERNAME, password = PASSWORD)
+        val userDto = UserDto(name = FIRST_USERNAME, password = PASSWORD)
         `when`(userService.findUser(userDto.name)).thenReturn(User(name = userDto.name, password = userDto.password!!))
 
         mvc.perform(
@@ -101,9 +101,9 @@ class UserControllerTest @Autowired constructor(
     }
 
     @Test
-    @WithMockUser(username = USERNAME, password = PASSWORD, roles = [ROLE])
+    @WithMockUser(username = FIRST_USERNAME, password = PASSWORD, roles = [ROLE])
     fun `should not get user`() {
-        val userDto = UserDto(name = "otherUser", password = "")
+        val userDto = UserDto(name = SECOND_USERNAME, password = PASSWORD)
         `when`(userService.findUser(userDto.name)).thenReturn(User(name = userDto.name, password = userDto.password!!))
 
         mvc.perform(

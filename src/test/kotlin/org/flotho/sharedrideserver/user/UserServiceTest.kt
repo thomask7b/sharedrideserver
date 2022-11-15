@@ -1,9 +1,11 @@
 package org.flotho.sharedrideserver.user
 
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.PASSWORD
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,8 +21,8 @@ class UserServiceTest @Autowired constructor(
     private val userService: UserService,
     private val userRepository: UserRepository
 ) {
-    @BeforeAll
-    fun setUp() {
+    @BeforeEach
+    fun beforeEach() {
         userRepository.deleteAll()
     }
 
@@ -31,31 +33,32 @@ class UserServiceTest @Autowired constructor(
 
     @Test
     fun `should create and find user`() {
-        val username = "testUser"
-        userService.createUser(UserDto(username, ""))
+        val user = UserDto(FIRST_USERNAME, PASSWORD)
 
-        assertEquals(userService.findUser(username).name, username)
+        userService.createUser(user)
+
+        val createdUser = userService.findUser(FIRST_USERNAME)
+        assertEquals(FIRST_USERNAME, createdUser.name)
+        assertEquals(PASSWORD, createdUser.password)
     }
 
     @Test
     fun `should not duplicate user`() {
-        val username = "sameUser"
-        userService.createUser(UserDto(username, ""))
+        userService.createUser(UserDto(FIRST_USERNAME, PASSWORD))
 
         assertThrows(DuplicateKeyException::class.java) {
-            userService.createUser(UserDto(username, ""))
+            userService.createUser(UserDto(FIRST_USERNAME, FIRST_USERNAME))
         }
     }
 
     @Test
     fun `should delete user`() {
-        val username = "deleteUser"
-        userService.createUser(UserDto(username, ""))
-        
-        userService.deleteUser(username)
+        userService.createUser(UserDto(FIRST_USERNAME, PASSWORD))
+
+        userService.deleteUser(FIRST_USERNAME)
 
         assertThrows(EmptyResultDataAccessException::class.java) {
-            userService.findUser(username)
+            userService.findUser(FIRST_USERNAME)
         }
     }
 }

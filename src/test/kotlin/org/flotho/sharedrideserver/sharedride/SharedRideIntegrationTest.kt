@@ -2,12 +2,14 @@ package org.flotho.sharedrideserver.sharedride
 
 import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.AbstractIntegrationTest
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.PASSWORD
 import org.flotho.sharedrideserver.direction.DirectionService
 import org.flotho.sharedrideserver.direction.model.DirectionsData
-import org.flotho.sharedrideserver.user.User
 import org.flotho.sharedrideserver.user.UserDto
 import org.flotho.sharedrideserver.user.UserRepository
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,10 +26,6 @@ class SharedRideIntegrationTest @Autowired constructor(
 ) : AbstractIntegrationTest(userRepository, restTemplate) {
 
     override val routePath = "/sharedride/"
-    private val userToAdd = "userToAdd"
-    private val userToAddPwd = "pwd"
-
-    private fun saveUserToAdd() = userRepository.save(User(name = userToAdd, password = userToAddPwd))
 
     private fun createSharedRide(headers: HttpHeaders): ObjectId {
         val sharedRideResponse = requestCreateSharedRide(headers)
@@ -49,9 +47,14 @@ class SharedRideIntegrationTest @Autowired constructor(
         )
     }
 
+    @BeforeEach
+    fun setUp() {
+        deleteUsers()
+    }
+
     @Test
     fun `should create shared ride`() {
-        saveTestUser()
+        saveFirstUser()
         val headers = login()
 
         val response = requestCreateSharedRide(headers)
@@ -62,7 +65,7 @@ class SharedRideIntegrationTest @Autowired constructor(
 
     @Test
     fun `should get shared ride`() {
-        saveTestUser()
+        saveFirstUser()
         val headers = login()
         val sharedRideId = createSharedRide(headers)
 
@@ -74,16 +77,16 @@ class SharedRideIntegrationTest @Autowired constructor(
         )
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertTrue(response.body!!.usersAndLocations.contains(username))
+        assertTrue(response.body!!.usersAndLocations.contains(FIRST_USERNAME))
     }
 
     @Test
     fun `should add new user to the shared ride`() {
-        saveTestUser()
-        saveUserToAdd()
+        saveFirstUser()
+        saveSecondUser()
         val testUserHeaders = login()
         val sharedRideId = createSharedRide(testUserHeaders)
-        val userToAddHeaders = login(UserDto(userToAdd, userToAddPwd))
+        val userToAddHeaders = login(UserDto(FIRST_USERNAME, PASSWORD))
 
         val response = restTemplate.exchange(
             getBaseUrl() + sharedRideId,
@@ -93,13 +96,13 @@ class SharedRideIntegrationTest @Autowired constructor(
         )
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertTrue(response.body!!.usersAndLocations.contains(username))
-        assertTrue(response.body!!.usersAndLocations.contains(userToAdd))
+        assertTrue(response.body!!.usersAndLocations.contains(FIRST_USERNAME))
+        assertTrue(response.body!!.usersAndLocations.contains(FIRST_USERNAME))
     }
 
     @Test
     fun `should delete shared ride`() {
-        saveTestUser()
+        saveFirstUser()
         val headers = login()
         val sharedRideId = createSharedRide(headers)
 
