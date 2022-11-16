@@ -38,7 +38,6 @@ class UserIntegrationTest @Autowired constructor(
         assertEquals(HttpStatus.CREATED, response.statusCode)
         val createdUser = userRepository.findOneByName(FIRST_USERNAME)
         assertEquals(FIRST_USERNAME, createdUser.name)
-        assertEquals(PASSWORD, createdUser.password)
     }
 
     @Test
