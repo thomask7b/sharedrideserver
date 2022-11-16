@@ -1,5 +1,6 @@
 package org.flotho.sharedrideserver.user
 
+import io.klogging.NoCoLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -16,7 +17,7 @@ import java.security.Principal
 @RequestMapping("/users")
 class UserController(
     private val userService: UserService
-) {
+) : NoCoLogging {
     @Operation(summary = "Crée un utlisateur", description = "Création d'un utilisateur en cas de réussite")
     @ApiResponses(
         value = [
@@ -28,8 +29,10 @@ class UserController(
     fun createUser(@RequestBody userDto: UserDto): ResponseEntity<Void> {
         return try {
             userService.createUser(userDto)
+            logger.info("Création de l'utilisateur ${userDto.name} réussie")
             ResponseEntity.created(URI.create("/users/${userDto.name}")).build()
         } catch (e: Exception) {
+            logger.error(e, "Echec lors de la création de l'utilisateur ${userDto.name}")
             ResponseEntity.badRequest().build()
         }
     }
@@ -49,11 +52,14 @@ class UserController(
     fun deleteUser(authenticatedUser: Principal, @PathVariable("name") name: String): ResponseEntity<Void> {
         return try {
             if (!isAuthenticated(authenticatedUser, name)) {
+                logger.warn("Suppression non autorisée car l'utilisateur n'est pas connecté")
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
             userService.deleteUser(name)
+            logger.info("L'utilisateur $name a bien été supprimé")
             ResponseEntity.accepted().build()
         } catch (e: Exception) {
+            logger.error(e, "Erreur lors de la suppression de l'utilisateur $name")
             ResponseEntity.badRequest().build()
         }
     }
@@ -77,11 +83,14 @@ class UserController(
     fun getUser(authenticatedUser: Principal, @PathVariable("name") name: String): ResponseEntity<UserDto> {
         return try {
             if (!isAuthenticated(authenticatedUser, name)) {
+                logger.warn("Récupération non autorisée car l'utilisateur n'est pas authentifié")
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
             val user = userService.findUser(name)
+            logger.info("Récupération réussie pour l'utilisateur $name")
             ResponseEntity.ok(UserDto(user.name))
         } catch (e: Exception) {
+            logger.error(e, "Erreur lors de la récupération de l'utilisateur $name")
             ResponseEntity.badRequest().build()
         }
     }

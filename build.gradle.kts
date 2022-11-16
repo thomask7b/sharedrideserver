@@ -26,8 +26,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-data-rest:1.6.12")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
     implementation("org.springdoc:springdoc-openapi-kotlin:1.6.12")
+    implementation("io.klogging:klogging-jvm:0.4.9")
 
-    implementation("com.google.maps:google-maps-services:2.1.0")
+    implementation("com.google.maps:google-maps-services:2.1.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
