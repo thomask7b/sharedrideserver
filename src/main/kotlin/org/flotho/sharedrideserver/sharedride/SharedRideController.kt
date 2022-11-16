@@ -1,5 +1,6 @@
 package org.flotho.sharedrideserver.sharedride
 
+import io.klogging.NoCoLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -20,7 +21,7 @@ class SharedRideController(
     private val sharedRideService: SharedRideService,
     private val userService: UserService,
     private val directionService: DirectionService
-) {
+) : NoCoLogging {
     @Operation(
         summary = "Crée un shared ride", description = "Création d'un shared ride. Il contiendra les " +
                 "utilisateurs et leurs localisations, ainsi que l'itinéraire renvoyé par l'API Directions de Google Maps."
@@ -38,8 +39,10 @@ class SharedRideController(
             val route = directionService.requestDirection(steps)
             val sharedRide = SharedRide(usersAndLocations = mutableMapOf(Pair(user.name, null)), direction = route!!)
             sharedRideService.createSharedRide(sharedRide)
+            logger.info("Le shared ride a bien été créé avec l'id : ${sharedRide.id}")
             ResponseEntity.created(URI.create("/sharedride/${sharedRide.id}")).build()
         } catch (e: Exception) {
+            logger.error(e, "Echec lors de la création du shared ride par l'utilisateur ${authenticatedUser.name}")
             ResponseEntity.badRequest().build()
         }
     }
@@ -62,8 +65,10 @@ class SharedRideController(
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
             }
             sharedRideService.deleteSharedRide(ObjectId(id))
+            logger.info("Le shared ride avec l'id $id a bien été supprimé")
             ResponseEntity.accepted().build()
         } catch (e: Exception) {
+            logger.error(e, "Erreur lors de la suppression du shared ride $id")
             ResponseEntity.badRequest().build()
         }
     }
@@ -87,8 +92,12 @@ class SharedRideController(
             if (!sharedRide.get().usersAndLocations.contains(username)) {
                 sharedRide = sharedRideService.updateSharedRide(sharedRide.get().id, username)
             }
+            logger.info("Le shared ride $id est récupéré par l'utilisateur ${authenticatedUser.name}")
             ResponseEntity.ok(sharedRide.get())
         } catch (e: Exception) {
+            logger.error(
+                e, "Erreur lors de la récupération du shared ride $id par l'utilisateur ${authenticatedUser.name}"
+            )
             ResponseEntity.badRequest().build()
         }
     }

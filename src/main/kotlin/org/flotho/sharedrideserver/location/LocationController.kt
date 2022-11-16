@@ -1,6 +1,7 @@
 package org.flotho.sharedrideserver.location
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.klogging.NoCoLogging
 import org.bson.types.ObjectId
 import org.flotho.sharedrideserver.Utils.isAuthenticated
 import org.flotho.sharedrideserver.sharedride.SharedRideService
@@ -10,13 +11,13 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 import java.security.Principal
 
-
 @Controller
 class LocationController(
     val objectMapper: ObjectMapper,
     val sharedRideService: SharedRideService,
     val template: SimpMessagingTemplate
-) {
+) : NoCoLogging {
+
     @MessageMapping("/location")
     @SendTo("/sharedride-ws/locations")
     fun updateRealTimeLocation(authenticatedUser: Principal, jsonUserLocation: String) {
@@ -31,6 +32,7 @@ class LocationController(
                 users.forEach {
                     template.convertAndSendToUser(it, "/sharedride-ws/locations", jsonUserLocation)
                 }
+                logger.info("La localisation ${userLocation.location} a bien été envoyée aux utilisateurs du shared ride ${userLocation.sharedRideId}")
             }
         }
     }
