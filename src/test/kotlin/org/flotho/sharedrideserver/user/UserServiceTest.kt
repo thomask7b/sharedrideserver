@@ -39,7 +39,6 @@ class UserServiceTest @Autowired constructor(
 
         val createdUser = userService.findUser(FIRST_USERNAME)
         assertEquals(FIRST_USERNAME, createdUser.name)
-        assertEquals(PASSWORD, createdUser.password)
     }
 
     @Test

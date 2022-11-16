@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpSession
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin
 import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated
 import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated
@@ -30,12 +31,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginSecurityTest @Autowired constructor(
     val mockMvc: MockMvc,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    val passwordEncoder: PasswordEncoder
 ) {
     @BeforeAll
     fun setUp() {
         userRepository.deleteAll()
-        userRepository.save(User(name = FIRST_USERNAME, password = PASSWORD))
+        userRepository.save(User(name = FIRST_USERNAME, password = passwordEncoder.encode(PASSWORD)))
     }
 
     @AfterAll
