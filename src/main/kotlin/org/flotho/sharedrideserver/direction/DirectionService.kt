@@ -19,7 +19,7 @@ class DirectionService(
     fun requestDirection(places: List<String>): DirectionsData? {
         logger.info("Demande d'un itinéraire pour : $places")
         return convertDirectionsResultToDirectionsData(
-            DirectionsApi.newRequest(context)
+            DirectionsApi.newRequest(context)//TODO éviter les péages, plus rapide, plus court
                 .origin(places[0])
                 .destination(places.last())
                 .waypoints(*places.subList(1, places.size - 1).toTypedArray())

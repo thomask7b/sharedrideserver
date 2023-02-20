@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 
 data class Polyline(
-    @JsonProperty("encoded_path")
+    @JsonProperty("points")
     @JsonAlias("encodedPath")
     val encodedPath: String?
 )

@@ -32,7 +32,7 @@ class LocationController(
                 users.forEach {
                     template.convertAndSendToUser(it, "/sharedride-ws/locations", jsonUserLocation)
                 }
-                logger.info("La localisation ${userLocation.location} a bien été envoyée aux utilisateurs du shared ride ${userLocation.sharedRideId}")
+                logger.info("${userLocation.username} a envoyé la localisation ${userLocation.location} aux utilisateurs du shared ride ${userLocation.sharedRideId}")
             }
         }
     }
