@@ -1,32 +1,23 @@
 package org.flotho.sharedrideserver.direction.model
 
-import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.springframework.data.mongodb.core.mapping.Field
 
 
 data class Leg(
     val steps: List<Step>,
     val distance: Distance?,
     val duration: Duration?,
-    @JsonProperty("duration_in_traffic")
-    @JsonAlias("durationInTraffic")
-    val durationInTraffic: String?,
-    @JsonProperty("arrival_time")
-    @JsonAlias("arrivalTime")
-    val arrivalTime: String?,
-    @JsonProperty("departure_time")
-    @JsonAlias("departureTime")
-    val departureTime: String?,
     @JsonProperty("start_location")
-    @JsonAlias("startLocation")
+    @Field("start_location")
     val startLocation: LatLng?,
     @JsonProperty("end_location")
-    @JsonAlias("endLocation")
+    @Field("end_location")
     val endLocation: LatLng?,
     @JsonProperty("start_address")
-    @JsonAlias("startAddress")
+    @Field("start_address")
     val startAddress: String?,
     @JsonProperty("end_address")
-    @JsonAlias("endAddress")
+    @Field("end_address")
     val endAddress: String?
 )

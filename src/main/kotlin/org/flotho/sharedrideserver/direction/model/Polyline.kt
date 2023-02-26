@@ -1,11 +1,11 @@
 package org.flotho.sharedrideserver.direction.model
 
-import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.springframework.data.mongodb.core.mapping.Field
 
 
 data class Polyline(
     @JsonProperty("points")
-    @JsonAlias("encodedPath")
+    @Field("points")
     val encodedPath: String?
 )

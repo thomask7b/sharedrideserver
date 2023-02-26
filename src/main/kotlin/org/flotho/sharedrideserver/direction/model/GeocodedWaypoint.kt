@@ -1,18 +1,15 @@
 package org.flotho.sharedrideserver.direction.model
 
-import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.springframework.data.mongodb.core.mapping.Field
 
 
 data class GeocodedWaypoint(
     @JsonProperty("geocoder_status")
-    @JsonAlias("geocoderStatus")
+    @Field("geocoder_status")
     val geocoderStatus: String?,
-    @JsonProperty("partial_match")
-    @JsonAlias("partialMatch")
-    val partialMatch: Boolean?,
     @JsonProperty("place_id")
-    @JsonAlias("placeId")
+    @Field("place_id")
     val placeId: String?,
     val types: List<String>
 )
