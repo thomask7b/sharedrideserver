@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "org.flotho"
-version = "0.0.1"
+version = "0.0.2"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -23,11 +23,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.springdoc:springdoc-openapi-data-rest:1.6.11")
-    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
-    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.11")
+    implementation("org.springdoc:springdoc-openapi-data-rest:1.6.12")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.12")
+    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.12")
+    implementation("io.klogging:klogging-jvm:0.4.9")
 
-    implementation("com.google.maps:google-maps-services:2.1.0")
+    implementation("com.google.maps:google-maps-services:2.1.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

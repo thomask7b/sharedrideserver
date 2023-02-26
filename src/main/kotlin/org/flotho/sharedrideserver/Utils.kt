@@ -1,7 +1,6 @@
 package org.flotho.sharedrideserver
 
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetails
+import java.security.Principal
 
 object Utils {
     @JvmStatic
@@ -10,7 +9,7 @@ object Utils {
     }
 
     @JvmStatic
-    fun usernameFromAuthentication(auth: Authentication): String {
-        return (auth.principal as UserDetails).username
+    fun isAuthenticated(authenticatedUser: Principal, usernameAccessed: String): Boolean {
+        return usernameAccessed == authenticatedUser.name
     }
 }

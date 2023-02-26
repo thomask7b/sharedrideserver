@@ -1,7 +1,9 @@
 package org.flotho.sharedrideserver.sharedride
 
-import com.google.maps.model.DirectionsResult
 import org.awaitility.Awaitility.await
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.SECOND_USERNAME
+import org.flotho.sharedrideserver.direction.model.DirectionsData
 import org.flotho.sharedrideserver.location.Location
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
@@ -12,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo
 import org.springframework.boot.test.context.SpringBootTest
 import java.util.concurrent.TimeUnit
-
-private const val FIRST_USER = "first"
-private const val SECOND_USER = "second"
 
 @SpringBootTest
 @AutoConfigureDataMongo
@@ -35,8 +34,8 @@ class SharedRideServiceTest @Autowired constructor(
 
     private fun createSharedRide(): SharedRide {
         val sharedRide = SharedRide(
-            usersAndLocations = mutableMapOf(Pair(FIRST_USER, null)),
-            direction = DirectionsResult()
+            usersAndLocations = mutableMapOf(Pair(FIRST_USERNAME, null)),
+            direction = DirectionsData(listOf(), listOf())
         )
         sharedRideService.createSharedRide(sharedRide)
         return sharedRide
@@ -53,9 +52,13 @@ class SharedRideServiceTest @Autowired constructor(
     fun `should add user in sharedRide`() {
         val sharedRide = createSharedRide()
 
-        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, SECOND_USER)
+        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, SECOND_USERNAME)
 
-        assertTrue(updatedSharedRide.get().usersAndLocations.contains(SECOND_USER))
+        assertTrue(updatedSharedRide.get().usersAndLocations.contains(SECOND_USERNAME))
+        assertEquals(
+            setOf(FIRST_USERNAME, SECOND_USERNAME),
+            sharedRideService.getSharedRideUsernames(updatedSharedRide.get().id).get()
+        )
     }
 
     @Test
@@ -63,8 +66,8 @@ class SharedRideServiceTest @Autowired constructor(
         val location = Location(11.79584, 9.83205)
         val sharedRide = createSharedRide()
 
-        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, FIRST_USER, location)
-        val userLocationInSharedRide = updatedSharedRide.get().usersAndLocations[FIRST_USER]
+        val updatedSharedRide = sharedRideService.updateSharedRide(sharedRide.id, FIRST_USERNAME, location)
+        val userLocationInSharedRide = updatedSharedRide.get().usersAndLocations[FIRST_USERNAME]
 
         assertEquals(userLocationInSharedRide?.latitude, location.latitude)
         assertEquals(userLocationInSharedRide?.longitude, location.longitude)
@@ -84,15 +87,15 @@ class SharedRideServiceTest @Autowired constructor(
         val location = Location(11.79584, 9.83205)
         val sharedRide = createSharedRide()
 
-        sharedRideService.updateCache(sharedRide.id, FIRST_USER, location)
+        sharedRideService.updateCache(sharedRide.id, FIRST_USERNAME, location)
 
-        assertNull(sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USER])
+        assertNull(sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USERNAME])
         await()
             .atMost(2, TimeUnit.SECONDS)
             .untilAsserted {
                 assertEquals(
                     location,
-                    sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USER]
+                    sharedRideService.findSharedRide(sharedRide.id).get().usersAndLocations[FIRST_USERNAME]
                 )
             }
     }

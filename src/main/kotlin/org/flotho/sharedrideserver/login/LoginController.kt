@@ -1,5 +1,6 @@
 package org.flotho.sharedrideserver.login
 
+import io.klogging.NoCoLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class LoginController(
     private val authenticationManager: AuthenticationManager
-) {
+) : NoCoLogging {
     @Operation(summary = "Authentification", description = "Authentifie un utilisateur")
     @ApiResponses(
         value = [
@@ -33,8 +34,10 @@ class LoginController(
             SecurityContextHolder.getContext().authentication =
                 authenticationManager.authenticate(UsernamePasswordAuthenticationToken(userDto.name, userDto.password))
         } catch (e: AuthenticationException) {
+            logger.error(e, "L'authentification a échoué pour l'utilisateur ${userDto.name}")
             return ResponseEntity.badRequest().build()
         }
+        logger.info("Authentification réussie pour l'utilisateur ${userDto.name}")
         return ResponseEntity.ok().build()
     }
 

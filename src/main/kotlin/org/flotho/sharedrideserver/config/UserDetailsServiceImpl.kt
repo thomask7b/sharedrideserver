@@ -15,7 +15,7 @@ class UserDetailsServiceImpl(
     override fun loadUserByUsername(username: String?): UserDetails {
         try {
             val user = userRepository.findOneByName(username!!)
-            return User.withDefaultPasswordEncoder()
+            return User.builder()
                 .username(user.name)
                 .password(user.password)
                 .roles("USER")

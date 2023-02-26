@@ -1,7 +1,10 @@
 package org.flotho.sharedrideserver.user
 
 import org.flotho.sharedrideserver.AbstractIntegrationTest
+import org.flotho.sharedrideserver.FIRST_USERNAME
+import org.flotho.sharedrideserver.PASSWORD
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -17,28 +20,33 @@ class UserIntegrationTest @Autowired constructor(
 
     override val routePath = "/users/"
 
+    @BeforeEach
+    fun setUp() {
+        deleteUsers()
+    }
+
     @Test
     fun `should create user`() {
-        val username = "testCreateUser"
-        val password = "zeze"
+        val user = UserDto(FIRST_USERNAME, PASSWORD)
 
         val response = restTemplate.postForEntity(
             getBaseUrl() + "create",
-            UserDto(username, password),
+            user,
             Void::class.java
         )
 
         assertEquals(HttpStatus.CREATED, response.statusCode)
-        assertEquals(password, userRepository.findOneByName(username).password)
+        val createdUser = userRepository.findOneByName(FIRST_USERNAME)
+        assertEquals(FIRST_USERNAME, createdUser.name)
     }
 
     @Test
     fun `should not create user`() {
-        saveTestUser()
+        saveFirstUser()
 
         val response = restTemplate.postForEntity(
             getBaseUrl() + "create",
-            UserDto(username, password),
+            UserDto(FIRST_USERNAME, PASSWORD),
             Void::class.java
         )
 
@@ -47,11 +55,11 @@ class UserIntegrationTest @Autowired constructor(
 
     @Test
     fun `should delete user`() {
-        saveTestUser()
+        saveFirstUser()
         val headers = login()
 
         val response = restTemplate.exchange(
-            getBaseUrl() + username,
+            getBaseUrl() + FIRST_USERNAME,
             HttpMethod.DELETE,
             HttpEntity(null, headers),
             Void::class.java
@@ -59,17 +67,17 @@ class UserIntegrationTest @Autowired constructor(
 
         assertEquals(HttpStatus.ACCEPTED, response.statusCode)
         assertThrows(EmptyResultDataAccessException::class.java) {
-            userRepository.findOneByName(username)
+            userRepository.findOneByName(FIRST_USERNAME)
         }
     }
 
     @Test
     fun `should return single user by name`() {
-        saveTestUser()
+        saveFirstUser()
         val headers = login()
 
         val response = restTemplate.exchange(
-            getBaseUrl() + username,
+            getBaseUrl() + FIRST_USERNAME,
             HttpMethod.GET,
             HttpEntity(null, headers),
             UserDto::class.java
@@ -77,13 +85,13 @@ class UserIntegrationTest @Autowired constructor(
 
         assertEquals(HttpStatus.OK, response.statusCode)
         assertNotNull(response.body)
-        assertEquals(username, response.body?.name)
+        assertEquals(FIRST_USERNAME, response.body?.name)
     }
 
     @Test
     fun `should not access other users`() {
-        saveTestUser()
-        val accessedUser = userRepository.save(User(name = "accessedUser", password = "test"))
+        saveFirstUser()
+        val accessedUser = saveSecondUser()
         val headers = login()
 
         val response = restTemplate.exchange(
